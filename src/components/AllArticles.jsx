@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import ArticleCard from "./ArticleCard";
+import { getArticles } from "../../api.js";
 
-const AllArticles = ({ articles, isLoading }) => {
+const AllArticles = () => {
+  const [articles, setArticles] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    getArticles().then(({ data: { articles } }) => {
+      setArticles(articles);
+      setIsLoading(false);
+    });
+  }, []);
   if (isLoading) return <p>Loading articles...</p>;
 
   return (
