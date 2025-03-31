@@ -1,24 +1,15 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { UserProvider } from "../contexts/User.jsx";
-import { getArticles } from "../api.js";
+import { UserProvider } from "./contexts/User.jsx";
 import "bootstrap/dist/css/bootstrap.css";
 import { Route, Routes } from "react-router-dom";
-import Home from "../components/Home";
-import Nav from "../components/Nav";
-import Header from "../components/Header";
-import AllArticles from "../components/AllArticles";
+import Home from "./components/Home.jsx";
+import Nav from "./components/Nav.jsx";
+import Header from "./components/Header.jsx";
+import AllArticles from "./components/AllArticles.jsx";
+import IndividualArticle from "./components/IndividualArticle.jsx";
 
 function App() {
-  const [articles, setArticles] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    getArticles().then(({ data: { articles } }) => {
-      setArticles(articles);
-      setIsLoading(false);
-    });
-  }, []);
-
   return (
     <>
       <UserProvider>
@@ -27,15 +18,10 @@ function App() {
           <Nav />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/articles/*" element={<AllArticles />} />
             <Route
-              path="/articles/*"
-              element={
-                <AllArticles
-                  articles={articles}
-                  setArticles={setArticles}
-                  isLoading={isLoading}
-                />
-              }
+              path="/articles/:article_id"
+              element={<IndividualArticle />}
             />
           </Routes>
         </div>
