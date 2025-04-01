@@ -1,17 +1,12 @@
 import { useState, useEffect } from "react";
 import ArticleCard from "./ArticleCard";
 import { getArticles } from "../../api.js";
+import useApiRequest from "../hooks/useApiRequest.jsx";
 
 const AllArticles = () => {
-  const [articles, setArticles] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    getArticles().then(({ data: { articles } }) => {
-      setArticles(articles);
-      setIsLoading(false);
-    });
-  }, []);
+  const { data: articles, isLoading, error } = useApiRequest(getArticles);
   if (isLoading) return <p>Loading articles...</p>;
+  if (error) return { error };
 
   return (
     <div className="container mt-3">
