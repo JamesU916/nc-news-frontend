@@ -7,6 +7,7 @@ import Home from "./components/Home.jsx";
 import Nav from "./components/Nav.jsx";
 import Header from "./components/Header.jsx";
 import AllArticles from "./components/AllArticles.jsx";
+import AllTopics from "./components/AllTopics.jsx";
 import IndividualArticle from "./components/IndividualArticle.jsx";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
               path="/articles/:article_id"
               element={<IndividualArticle />}
             />
+            <Route path="/topics/" element={<AllTopics />} />
           </Routes>
         </div>
       </UserProvider>
