@@ -4,8 +4,10 @@ import {
   getArticleCommentsById,
   patchArticleVotes,
   postComment,
+  deleteComment,
 } from "../../api";
 import useApiRequest from "../hooks/useApiRequest";
+import useDeleteRequest from "../hooks/useDeleteRequest";
 import usePatchRequest from "../hooks/usePatchRequest";
 import { useEffect, useState, useContext } from "react";
 import usePostRequest from "../hooks/usePostRequest";
@@ -42,7 +44,14 @@ const IndividualArticle = () => {
   } = useApiRequest(getArticleCommentsById, article_id);
 
   const [newComment, setNewComment] = useState("");
+  const [displayComments, setDisplayComments] = useState([]);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    if (comments) {
+      setDisplayComments(comments);
+    }
+  }, [comments]);
 
   const {
     startPost,
@@ -51,6 +60,12 @@ const IndividualArticle = () => {
     error: postError,
     success,
   } = usePostRequest(postComment);
+
+  const {
+    startDelete,
+    isDeleting,
+    error: deleteError,
+  } = useDeleteRequest(deleteComment);
 
   if (articleLoading) return <p>Loading articles...</p>;
   if (articleError) return <p>{error.statusText} articles</p>;
@@ -105,7 +120,12 @@ const IndividualArticle = () => {
       <div className="my-2">
         <button
           className="btn btn-info"
-          onClick={() => setShowForm((previous) => !previous)}
+          onClick={() => {
+            setShowForm((previous) => !previous);
+            if (!showForm) {
+              setNewComment("");
+            }
+          }}
         >
           {showForm ? "Close Form" : "✍️ Add Comment"}
         </button>
@@ -118,9 +138,10 @@ const IndividualArticle = () => {
             startPost(article_id, {
               username: loggedInUser,
               body: newComment,
-            }).then(() => {
+            }).then((newCommentData) => {
               setNewComment("");
               setShowForm(false);
+              setDisplayComments((current) => [newCommentData, ...current]);
             });
           }}
         >
@@ -144,12 +165,14 @@ const IndividualArticle = () => {
           {postError && (
             <p className="text-danger mt-2">{postError.statusText}</p>
           )}
-          {success && <p className="text-success mt-2">{success}</p>}
+          {showForm && success && (
+            <p className="text-success mt-2">{success}</p>
+          )}
         </form>
       )}
       <ul className="list-group mt-2">
-        {comments &&
-          comments.map((comment) => {
+        {displayComments &&
+          displayComments.map((comment) => {
             return (
               <li className="list-group-item" key={comment.comment_id}>
                 <p className="mb-1 text-start">{comment.body}</p>
@@ -159,6 +182,29 @@ const IndividualArticle = () => {
                 </small>
                 <br />
                 <small>Votes: {comment.votes}</small>
+
+                {comment.author === loggedInUser && (
+                  <div className="mt-2">
+                    <button
+                      className="btn btn-outline-danger"
+                      onClick={() => {
+                        setDisplayComments((current) =>
+                          current.filter(
+                            (c) => c.comment_id !== comment.comment_id
+                          )
+                        );
+
+                        startDelete(comment.comment_id).catch((error) => {
+                          {
+                            error.statusText;
+                          }
+                        });
+                      }}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                )}
               </li>
             );
           })}
