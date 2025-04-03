@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import "./App.css";
 import { UserProvider } from "./contexts/User.jsx";
 import "bootstrap/dist/css/bootstrap.css";
