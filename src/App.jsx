@@ -14,7 +14,7 @@ function App() {
   return (
     <>
       <UserProvider>
-        <div>
+        <div className="font-family">
           <Header />
           <Nav />
           <Routes>
