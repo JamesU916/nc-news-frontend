@@ -9,6 +9,7 @@ import Header from "./components/Header.jsx";
 import AllArticles from "./components/AllArticles.jsx";
 import AllTopics from "./components/AllTopics.jsx";
 import IndividualArticle from "./components/IndividualArticle.jsx";
+import NotFoundError from "./components/NotFoundError.jsx";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
               element={<IndividualArticle />}
             />
             <Route path="/topics/" element={<AllTopics />} />
+            <Route path="/*" element={<NotFoundError />} />
           </Routes>
         </div>
       </UserProvider>
