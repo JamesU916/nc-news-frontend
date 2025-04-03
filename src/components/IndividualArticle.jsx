@@ -12,6 +12,7 @@ import usePatchRequest from "../hooks/usePatchRequest";
 import { useEffect, useState, useContext } from "react";
 import usePostRequest from "../hooks/usePostRequest";
 import { UserContext } from "../contexts/User";
+import NotFoundError from "./NotFoundError";
 
 const IndividualArticle = () => {
   const loggedInUser = useContext(UserContext);
@@ -68,7 +69,11 @@ const IndividualArticle = () => {
   } = useDeleteRequest(deleteComment);
 
   if (articleLoading) return <p>Loading articles...</p>;
-  if (articleError) return <p>{error.statusText} articles</p>;
+  if (articleError) {
+    return (
+      <NotFoundError type="The article you are looking for does not exist." />
+    );
+  }
 
   if (commentsLoading) return <p>Loading comments...</p>;
   if (commentsError) return <p>{error.statusText} comments</p>;

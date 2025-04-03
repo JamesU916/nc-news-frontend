@@ -3,6 +3,7 @@ import ArticleCard from "./ArticleCard";
 import { getArticles } from "../../api.js";
 import useApiRequest from "../hooks/useApiRequest.jsx";
 import SortBy from "./SortBy.jsx";
+import NotFoundError from "./NotFoundError.jsx";
 
 const AllArticles = () => {
   const { data: articles, isLoading, error } = useApiRequest(getArticles);
@@ -16,6 +17,10 @@ const AllArticles = () => {
   const filtered = topic
     ? articles.filter((article) => article.topic === topic)
     : articles;
+
+  if (topic && filtered.length === 0) {
+    return <NotFoundError type={`No topics matching ${topic} found`} />;
+  }
 
   const sorted = [...filtered].sort((a, b) => {
     if (order === "asc") {
