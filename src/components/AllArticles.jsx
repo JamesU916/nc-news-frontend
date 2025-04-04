@@ -11,7 +11,8 @@ const AllArticles = () => {
   const topic = searchParams.get("topic");
   const sort_by = searchParams.get("sort_by") || "created_at";
   const order = searchParams.get("order") || "desc";
-  if (isLoading) return <p>Loading articles...</p>;
+  if (isLoading)
+    return <div className="spinner-border text-primary" role="status"></div>;
   if (error) return <p>{error.statusText}</p>;
 
   const filtered = topic
@@ -46,7 +47,7 @@ const AllArticles = () => {
       <div className="row">
         {sorted.map((article) => (
           <div className="col-12 col-md-4 mb-4" key={article.article_id}>
-            <div className="border p-3">
+            <div className="border p-3 article-hover">
               <ArticleCard article={article} />
             </div>
           </div>

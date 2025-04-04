@@ -44,3 +44,9 @@
 .font-family {
   font-family: "News Cycle", "Sans-Serif";
 }
+
+.article-hover:hover {
+  background-color: #e3cd75;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}

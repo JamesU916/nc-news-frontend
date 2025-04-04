@@ -5,7 +5,8 @@ import useApiRequest from "../hooks/useApiRequest.jsx";
 
 const AllTopics = () => {
   const { data: topics, isLoading, error } = useApiRequest(getTopics);
-  if (isLoading) return <p>Loading topics...</p>;
+  if (isLoading)
+    return <div className="spinner-border text-primary" role="status"></div>;
   if (error) return { error };
 
   return (
@@ -13,7 +14,7 @@ const AllTopics = () => {
       <div className="row">
         {topics.map((topic) => (
           <div className="col-12 col-md-4 mb-4" key={topic.slug}>
-            <div className="border p-3">
+            <div className="border p-3 article-hover">
               <TopicCard topic={topic} />
             </div>
           </div>

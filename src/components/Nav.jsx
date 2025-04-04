@@ -14,9 +14,9 @@ const Nav = () => {
       <Link className="nav-link" to="/topics">
         Topics{" "}
       </Link>
-      <Link className="nav-link" to="/users">
+      {/* <Link className="nav-link" to="/users">
         Users{" "}
-      </Link>
+      </Link> */}
     </nav>
   );
 };
