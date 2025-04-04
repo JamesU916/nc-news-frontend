@@ -1,18 +1,11 @@
 import { useParams } from "react-router-dom";
-import {
-  getArticleById,
-  getArticleCommentsById,
-  patchArticleVotes,
-  postComment,
-  deleteComment,
-} from "../../api";
+import { getArticleById } from "../../api";
 import useApiRequest from "../hooks/useApiRequest";
-import useDeleteRequest from "../hooks/useDeleteRequest";
-import usePatchRequest from "../hooks/usePatchRequest";
-import { useEffect, useState, useContext } from "react";
-import usePostRequest from "../hooks/usePostRequest";
+import { useContext } from "react";
 import { UserContext } from "../contexts/User";
 import NotFoundError from "./NotFoundError";
+import ArticleComments from "./ArticleComments";
+import ArticleVotes from "./ArticleVotes";
 
 const IndividualArticle = () => {
   const loggedInUser = useContext(UserContext);
@@ -22,61 +15,15 @@ const IndividualArticle = () => {
     isLoading: articleLoading,
     error: articleError,
   } = useApiRequest(getArticleById, article_id);
-
-  const [voteCount, setVoteCount] = useState(0);
-  useEffect(() => {
-    if (article) {
-      setVoteCount(article.votes);
-    }
-  }, [article]);
-  const { startPatch, error: voteError } = usePatchRequest(patchArticleVotes);
-
-  const handleArticleVote = (increment) => {
-    setVoteCount((current) => current + increment);
-    startPatch(article.article_id, increment).catch(() => {
-      setVoteCount((current) => current - increment);
-    });
-  };
-
-  const {
-    data: comments,
-    isLoading: commentsLoading,
-    error: commentsError,
-  } = useApiRequest(getArticleCommentsById, article_id);
-
-  const [newComment, setNewComment] = useState("");
-  const [displayComments, setDisplayComments] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-
-  useEffect(() => {
-    if (comments) {
-      setDisplayComments(comments);
-    }
-  }, [comments]);
-
-  const {
-    startPost,
-    data,
-    isPosting,
-    error: postError,
-    success,
-  } = usePostRequest(postComment);
-
-  const {
-    startDelete,
-    isDeleting,
-    error: deleteError,
-  } = useDeleteRequest(deleteComment);
-
-  if (articleLoading) return <p>Loading articles...</p>;
+  if (articleLoading)
+    return <div className="spinner-border text-primary" role="status"></div>;
   if (articleError) {
     return (
       <NotFoundError type="The article you are looking for does not exist." />
     );
   }
-
-  if (commentsLoading) return <p>Loading comments...</p>;
-  if (commentsError) return <p>{error.statusText} comments</p>;
+  const formattedTopic =
+    article.topic.charAt(0).toUpperCase() + article.topic.slice(1);
 
   return (
     <div className="container mt-3">
@@ -85,7 +32,7 @@ const IndividualArticle = () => {
         By {article.author} on{" "}
         {new Date(article.created_at).toLocaleDateString()}
       </small>
-      <p className="card-subtitle text-muted mb-2">{article.topic}</p>
+      <p className="card-subtitle text-muted mb-2">{formattedTopic}</p>
       {article.article_img_url && (
         <img
           src={article.article_img_url}
@@ -100,120 +47,11 @@ const IndividualArticle = () => {
           }}
         />
       )}
-      <p className="card-text fw-bold">Votes: {voteCount}</p>
-      <div className="mb-1">
-        <button
-          className="btn btn-outline-success me-1"
-          onClick={() => handleArticleVote(1)}
-        >
-          🩷 Like
-        </button>
-        <button
-          className="btn btn-outline-danger"
-          onClick={() => handleArticleVote(-1)}
-        >
-          ❌ Dislike
-        </button>
-      </div>
-      {voteError && <p className="text-danger">{voteError.statusText}</p>}
-      <p className="mt-3 text-start">{article.body}</p>
-
-      <hr />
-      <h2 className="mt-3, fw-bold">Comments</h2>
-      {comments && comments.length === 0 && <p>No comments yet</p>}
-
-      <div className="my-2">
-        <button
-          className="btn btn-info"
-          onClick={() => {
-            setShowForm((previous) => !previous);
-            if (!showForm) {
-              setNewComment("");
-            }
-          }}
-        >
-          {showForm ? "Close Form" : "✍️ Add Comment"}
-        </button>
-      </div>
-      {showForm && (
-        <form
-          className="mb-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            startPost(article_id, {
-              username: loggedInUser,
-              body: newComment,
-            }).then((newCommentData) => {
-              setNewComment("");
-              setShowForm(false);
-              setDisplayComments((current) => [newCommentData, ...current]);
-            });
-          }}
-        >
-          <div className="mb-3">
-            <textarea
-              className="form-control"
-              rows="3"
-              value={newComment}
-              onChange={(event) => setNewComment(event.target.value)}
-              placeholder="Type your comment here..."
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="btn btn-success"
-            disabled={isPosting}
-          >
-            {isPosting ? "Posting..." : "Post Comment"}
-          </button>
-          {postError && (
-            <p className="text-danger mt-2">{postError.statusText}</p>
-          )}
-          {showForm && success && (
-            <p className="text-success mt-2">{success}</p>
-          )}
-        </form>
-      )}
-      <ul className="list-group mt-2">
-        {displayComments &&
-          displayComments.map((comment) => {
-            return (
-              <li className="list-group-item" key={comment.comment_id}>
-                <p className="mb-1 text-start">{comment.body}</p>
-                <small className="text-muted">
-                  By {comment.author} on{" "}
-                  {new Date(comment.created_at).toLocaleDateString()}
-                </small>
-                <br />
-                <small>Votes: {comment.votes}</small>
-
-                {comment.author === loggedInUser && (
-                  <div className="mt-2">
-                    <button
-                      className="btn btn-outline-danger"
-                      onClick={() => {
-                        setDisplayComments((current) =>
-                          current.filter(
-                            (c) => c.comment_id !== comment.comment_id
-                          )
-                        );
-
-                        startDelete(comment.comment_id).catch((error) => {
-                          {
-                            error.statusText;
-                          }
-                        });
-                      }}
-                    >
-                      🗑️ Delete
-                    </button>
-                  </div>
-                )}
-              </li>
-            );
-          })}
-      </ul>
+      <ArticleVotes article={article} initialVotes={article.votes} />
+      <ArticleComments
+        article_id={article.article_id}
+        loggedInUser={loggedInUser}
+      />
     </div>
   );
 };

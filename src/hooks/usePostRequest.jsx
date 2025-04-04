@@ -14,7 +14,7 @@ const usePostRequest = (apiFunction) => {
     return apiFunction(...args)
       .then((response) => {
         setData(response);
-        setSuccess("Comment posted!");
+        alert("Comment posted!");
         return response;
       })
       .catch((error) => {
@@ -25,7 +25,7 @@ const usePostRequest = (apiFunction) => {
         setIsPosting(false);
       });
   };
-  return { startPost, data, isPosting, error, success };
+  return { startPost, data, isPosting, error };
 };
 
 export default usePostRequest;

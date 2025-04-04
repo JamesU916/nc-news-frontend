@@ -9,6 +9,9 @@ const useDeleteRequest = (apiFunction) => {
     setError(null);
 
     return apiFunction(...args)
+      .then(() => {
+        alert("Comment Deleted!");
+      })
       .catch((error) => {
         setError({ status: 400, statusText: "Failed to delete" });
         throw error;

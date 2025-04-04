@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 
 const ArticleCard = ({ article }) => {
+  const formattedTopic =
+    article.topic.charAt(0).toUpperCase() + article.topic.slice(1);
   return (
-    <Link to={`/articles/${article.article_id}`}>
+    <Link
+      to={`/articles/${article.article_id}`}
+      className="text-decoration-none"
+    >
       <div
         className="card h-100 shadow-sm d-flex flex-column"
         style={{ minHeight: "500px" }}
@@ -23,7 +28,7 @@ const ArticleCard = ({ article }) => {
 
         <div className="card-body d-flex flex-column">
           <p className="card-title fw-bold">{article.title}</p>
-          <p className="card-subtitle text-muted mb-2">{article.topic}</p>
+          <p className="card-subtitle text-muted mb-2">{formattedTopic}</p>
           <p className="card-text">Author: {article.author}</p>
           <p className="card-text">
             Date: {new Date(article.created_at).toLocaleDateString()}
